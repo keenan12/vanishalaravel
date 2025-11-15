@@ -1,0 +1,37 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+@import "tailwindcss";
+@import "tailwindcss/preflight";
+
+/* @import "tailwindcss"; */
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* Custom color theme */
+:root {
+    --bg: #f4e9d4;
+    --brand: #7a3328;
+}
+
+body {
+    background: var(--bg);
+}
+
+/* Simple floating animation */
+@keyframes floaty {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.animate-float {
+    animation: floaty 3s ease-in-out infinite;
+}
