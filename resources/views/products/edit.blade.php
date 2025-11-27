@@ -9,7 +9,7 @@
 @section('content')
 <div class="card" style="max-width: 750px; margin: auto; padding: 25px;">
     <div class="card-header" style="font-size: 24px; font-weight: 700; color: #2c3e50; margin: 0 0 25px 0;">
-        ✏️ Edit Produk: **{{ $product->name }}**
+        ✏️ Edit Produk: {{ $product->name }}
     </div>
 
     {{-- Pastikan enctype="multipart/form-data" ada untuk file upload --}}

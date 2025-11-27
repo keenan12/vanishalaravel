@@ -20,8 +20,7 @@ class PublicController extends Controller
         $products = Product::with('category')
                             ->where('status', 'active')
                             ->orderBy('created_at', 'desc')
-                            ->limit(6) // <-- Batasan 6 produk hanya di homepage
-                            ->get();
+                            ->paginate(12);
 
         // Asumsi view untuk homepage adalah public.index
         return view('public.index', compact('products')); 

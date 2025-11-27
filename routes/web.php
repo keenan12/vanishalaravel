@@ -7,12 +7,14 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\PublicController; 
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\CheckoutController; 
 use Illuminate\Support\Facades\Route;
 
 // --- ROUTES PUBLIC (TANPA LOGIN) ---
 Route::get('/', [PublicController::class, 'index'])->name('home');
-Route::post('/kontak', [PublicController::class, 'sendContact'])->name('contact.send');
+Route::get('/menu', [PublicController::class, 'menu'])->name('menu');
+Route::post('/contact', [PublicController::class, 'sendContact'])->name('contact.send');
 
 
 // 🛑 JALUR KHUSUS ADMIN (Dilindungi Middleware 'admin')
@@ -45,6 +47,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 Route::middleware('auth')->group(function () {
     
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+
     Route::get('/my-account', [PublicController::class, 'index'])->name('dashboard'); 
 
     // Profile Routes
@@ -57,5 +61,6 @@ Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [ProfileController::class, 'logout'])->name('logout');
 });
+
 
 require __DIR__.'/auth.php';

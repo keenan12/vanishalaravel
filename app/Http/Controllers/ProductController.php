@@ -9,18 +9,12 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    /**
-     * Tampilkan Daftar Produk (Admin Panel) dengan Filter.
-     */
     public function index(Request $request)
     {
-        // Ambil semua kategori untuk dropdown filter di view
         $categories = Category::all();
-
-        // Mulai query Produk
         $query = Product::with('category'); 
 
-        // --- Logika Filtering ---
+        // Filtering
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function($q) use ($search) {
@@ -28,56 +22,44 @@ class ProductController extends Controller
                   ->orWhere('sku', 'like', '%' . $search . '%');
             });
         }
-
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
         }
-        
         if ($request->filled('category_id')) { 
             $query->where('category_id', $request->input('category_id'));
         }
 
-        // --- Logika Sorting ---
+        // Sorting
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'desc');
-        
         if (in_array($sort, ['id', 'name', 'price', 'stock', 'created_at'])) {
             $query->orderBy($sort, $direction);
         }
 
         $products = $query->paginate(10)->withQueryString();
         
-        // Mengirim data kategori dan produk ke view
         return view('products.index', compact('products', 'categories'));
     }
 
-    /**
-     * Metode untuk Tampilan Publik (Menu).
-     */
     public function menu()
     {
-        // Ambil semua produk yang berstatus 'active'
         $products = Product::where('status', 'active')
-                           ->with('category') // Tambahkan with('category') jika data kategori digunakan di view
+                           ->with('category')
                            ->orderBy('created_at', 'desc')
-                           ->get(); 
+                           ->paginate(12); 
         
-        // Memanggil view public/produk.blade.php
-        return view('public.produk', compact('products')); 
+        $categories = Category::orderBy('name')->get();
+
+        return view('public.produk', compact('products', 'categories')); 
     }
 
-    /**
-     * Tampilkan form untuk membuat produk baru.
-     */
     public function create()
     {
         $categories = Category::all();
         return view('products.create', compact('categories'));
     }
 
-    /**
-     * Simpan (Store) produk baru ke database, termasuk upload gambar.
-     */
+    // --- METODE STORE (PERBAIKAN UTAMA) ---
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -89,17 +71,16 @@ class ProductController extends Controller
             'sku' => 'required|string|unique:products|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
             'status' => 'required|in:active,inactive',
-        ], [
-            'name.unique' => 'Nama produk sudah ada di database',
-            'sku.unique' => 'SKU produk sudah ada, gunakan yang berbeda',
-            'price.min' => 'Harga minimal Rp 1.000',
-            'category_id.required' => 'Kategori wajib dipilih',
         ]);
 
         try {
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('public/products'); 
-                $validated['image'] = Storage::url($imagePath); // Simpan path URL publik
+                // PERBAIKAN: Menggunakan disk 'public' secara eksplisit
+                // File akan disimpan di: storage/app/public/products/namaacak.jpg
+                $path = $request->file('image')->store('products', 'public'); 
+                
+                // Simpan URL publik ke database: /storage/products/namaacak.jpg
+                $validated['image'] = Storage::url($path); 
             }
             
             Product::create($validated);
@@ -107,45 +88,40 @@ class ProductController extends Controller
             return redirect()->route('admin.products.index')->with('success', '✅ Produk berhasil ditambahkan!');
             
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', '❌ Terjadi kesalahan saat menyimpan produk: ' . $e->getMessage());
+            return back()->withInput()->with('error', '❌ Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Tampilkan form untuk mengedit produk.
-     */
     public function edit(Product $product)
     {
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Update produk ke database, termasuk penggantian atau penghapusan gambar.
-     */
+    // --- METODE UPDATE (PERBAIKAN UTAMA) ---
     public function update(Request $request, Product $product)
     {
-        // --- LOGIKA PENGHAPUSAN GAMBAR DARI CHECKBOX ---
+        // 1. Logika Hapus Gambar via Checkbox
         if ($request->has('remove_image') && $product->image) {
             try {
-                // Hapus file fisik (konversi /storage/... ke public/...)
-                Storage::delete(str_replace('/storage', 'public', $product->image));
+                // Bersihkan path untuk disk 'public' (hapus '/storage/')
+                $relativePath = str_replace('/storage/', '', $product->image);
+                if (Storage::disk('public')->exists($relativePath)) {
+                    Storage::disk('public')->delete($relativePath);
+                }
                 
-                // Set field 'image' di database menjadi NULL
                 $product->image = NULL; 
                 $product->save(); 
                 
-                // Jika hanya menghapus gambar dan tidak ada file baru di-upload, selesai.
                 if (!$request->hasFile('image')) {
-                    return redirect()->route('admin.products.index')->with('success', '✅ Gambar produk berhasil dihapus!');
+                    return redirect()->route('admin.products.index')->with('success', '✅ Gambar dihapus!');
                 }
-                
             } catch (\Exception $e) {
-                \Log::error('Gagal menghapus gambar lama: ' . $e->getMessage());
+                \Log::error('Error hapus gambar: ' . $e->getMessage());
             }
         }
-        // --------------------------------------------------------------------
 
+        // 2. Validasi
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:products,name,' . $product->id,
             'description' => 'nullable|string',
@@ -158,47 +134,49 @@ class ProductController extends Controller
         ]);
 
         try {
-            // Logika Update Gambar BARU
+            // 3. Logika Upload Gambar Baru
             if ($request->hasFile('image')) {
-                // Hapus gambar lama (jika ada) saat gambar baru di-upload
+                // Hapus gambar lama jika ada
                 if ($product->image) {
-                    Storage::delete(str_replace('/storage', 'public', $product->image)); 
+                    $oldPath = str_replace('/storage/', '', $product->image);
+                    if (Storage::disk('public')->exists($oldPath)) {
+                        Storage::disk('public')->delete($oldPath);
+                    }
                 }
-                $imagePath = $request->file('image')->store('public/products');
-                $validated['image'] = Storage::url($imagePath);
+                
+                // Upload baru ke disk 'public'
+                $path = $request->file('image')->store('products', 'public');
+                $validated['image'] = Storage::url($path);
             } else {
-                // Hapus key 'image' dari $validated agar tidak menimpa data gambar lama 
-                // jika tidak ada file baru di-upload DAN tidak ada request hapus.
+                // Jangan ubah field image jika tidak ada upload baru
                 unset($validated['image']); 
             }
             
             $product->update($validated);
             
-            return redirect()->route('admin.products.index')->with('success', '✅ Produk berhasil diperbarui!');
+            return redirect()->route('admin.products.index')->with('success', '✅ Produk diperbarui!');
             
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', '❌ Terjadi kesalahan saat update produk: ' . $e->getMessage());
+            return back()->withInput()->with('error', '❌ Gagal update: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Hapus produk dari database dan storage.
-     */
     public function destroy(Product $product)
     {
         try {
-            // Logika Hapus Gambar Fisik
             if ($product->image) {
-                // Konversi path /storage/... menjadi public/... sebelum dihapus
-                Storage::delete(str_replace('/storage', 'public', $product->image));
+                $relativePath = str_replace('/storage/', '', $product->image);
+                if (Storage::disk('public')->exists($relativePath)) {
+                    Storage::disk('public')->delete($relativePath);
+                }
             }
             
             $product->delete();
             
-            return redirect()->route('admin.products.index')->with('success', '✅ Produk berhasil dihapus!');
+            return redirect()->route('admin.products.index')->with('success', '✅ Produk dihapus!');
             
         } catch (\Exception $e) {
-            return back()->with('error', '❌ Terjadi kesalahan saat menghapus: ' . $e->getMessage());
+            return back()->with('error', '❌ Gagal menghapus: ' . $e->getMessage());
         }
     }
 }
