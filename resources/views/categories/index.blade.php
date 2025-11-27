@@ -9,7 +9,7 @@
     <div class="card-header">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <span>Daftar Kategori</span>
-            <a href="{{ route('categories.create') }}" class="btn btn-primary">+ Tambah Kategori</a>
+            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">+ Tambah Kategori</a>
         </div>
     </div>
 
@@ -29,8 +29,8 @@
                     <td>{{ $category->name }}</td>
                     <td>{{ $category->description ?? '-' }}</td>
                     <td>
-                        <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-primary" style="padding: 4px 8px; font-size: 12px;">Edit</a>
-                        <form method="POST" action="{{ route('categories.destroy', $category->id) }}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus?')">
+                        <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-primary" style="padding: 4px 8px; font-size: 12px;">Edit</a>
+                        <form method="POST" action="{{ route('admin.categories.destroy', $category->id) }}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;">Hapus</button>

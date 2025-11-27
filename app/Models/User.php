@@ -32,24 +32,15 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * ✅ PERBAIKAN: Get avatar URL dengan path yang benar
-     * Avatar di database disimpan sebagai: avatars/xxx.jpg
-     * Jadi langsung pakai: storage/{avatar}
-     */
     public function getAvatarUrl()
     {
         if ($this->avatar) {
-            // ✅ BENAR - Langsung pakai path dari database
             return asset('storage/' . $this->avatar);
         }
         // Fallback ke UI Avatars dengan ukuran 240px (bukan 40px)
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=667eea&color=fff&size=240';
     }
 
-    /**
-     * Get user initials (2 huruf pertama dari nama)
-     */
     public function getInitials()
     {
         $parts = explode(' ', $this->name);

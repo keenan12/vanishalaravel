@@ -9,27 +9,21 @@ use Illuminate\Http\Request;
 
 class SalesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $sales = Sale::with('product')->latest()->paginate(15);
         return view('sales.index', compact('sales'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         $products = Product::where('status', 'active')->get();
         return view('sales.create', compact('products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -77,37 +71,30 @@ class SalesController extends Controller
                 'notes' => 'Pembeli: ' . ($validated['customer_name'] ?? 'Umum'),
             ]);
 
-            return redirect()->route('sales.index')
+            // PERBAIKAN UTAMA 1: Gunakan rute admin.sales.index
+            return redirect()->route('admin.sales.index')
                 ->with('success', '✅ Penjualan berhasil dicatat!');
 
         } catch (\Exception $e) {
+            // Notifikasi error Exception (misalnya DB down)
             return back()
                 ->withInput()
                 ->with('error', '❌ Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Sale $sale)
     {
         $sale->load('product');
         return view('sales.show', compact('sale'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Sale $sale)
     {
         $products = Product::where('status', 'active')->get();
         return view('sales.edit', compact('sale', 'products'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Sale $sale)
     {
         $validated = $request->validate([
@@ -119,16 +106,24 @@ class SalesController extends Controller
         try {
             // Restore original stock
             $originalProduct = Product::find($sale->product_id);
-            $originalProduct->increment('stock', $sale->quantity);
+            if ($originalProduct) {
+                $originalProduct->increment('stock', $sale->quantity);
+            }
 
             // Get new product
             $newProduct = Product::findOrFail($validated['product_id']);
 
-            // Check new stock
-            if ($newProduct->stock < $validated['quantity']) {
-                return back()
+            // Check stock availability for new quantity
+            if ($newProduct->id !== $sale->product_id && $newProduct->stock < $validated['quantity']) {
+                 // Jika produknya beda, dan stoknya kurang
+                 return back()
                     ->withInput()
-                    ->withErrors(['quantity' => "❌ Stock tidak cukup. Stock tersedia: {$newProduct->stock}"]);
+                    ->withErrors(['quantity' => "❌ Stock produk baru tidak cukup. Stock tersedia: {$newProduct->stock}"]);
+            } elseif ($newProduct->id === $sale->product_id && $newProduct->stock + $sale->quantity < $validated['quantity']) {
+                 // Jika produknya sama, pastikan stok yang tersedia (setelah di-restore) cukup
+                 return back()
+                    ->withInput()
+                    ->withErrors(['quantity' => "❌ Stock tidak cukup. Stock tersedia: " . ($newProduct->stock + $sale->quantity)]);
             }
 
             // Deduct new stock
@@ -145,35 +140,35 @@ class SalesController extends Controller
                 'customer_name' => $validated['customer_name'] ?? 'Umum',
             ]);
 
-            return redirect()->route('sales.index')
+            return redirect()->route('admin.sales.index')
                 ->with('success', '✅ Penjualan berhasil diperbarui!');
 
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', '❌ Terjadi kesalahan: ' . $e->getMessage());
+                ->with('error', '❌ Terjadi kesalahan saat update: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Sale $sale)
     {
         try {
             // Restore stock
             $product = Product::find($sale->product_id);
-            $product->increment('stock', $sale->quantity);
+            if ($product) { // Pastikan produk ada
+                $product->increment('stock', $sale->quantity);
+            }
 
             // Delete sale
             $sale->delete();
 
-            return redirect()->route('sales.index')
-                ->with('success', '✅ Penjualan berhasil dihapus!');
+            // PERBAIKAN UTAMA 3: Gunakan rute admin.sales.index
+            return redirect()->route('admin.sales.index')
+                ->with('success', '✅ Penjualan berhasil dihapus dan stock telah dikembalikan!');
 
         } catch (\Exception $e) {
             return back()
-                ->with('error', '❌ Terjadi kesalahan: ' . $e->getMessage());
+                ->with('error', '❌ Gagal menghapus penjualan: ' . $e->getMessage());
         }
     }
 }

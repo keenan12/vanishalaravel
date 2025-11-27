@@ -1,52 +1,72 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+{{-- resources/views/auth/register.blade.php --}}
+@extends('layouts.public')
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+@section('title', 'Daftar | Vanisha Bakery')
+
+@section('content')
+    <section style="min-height:70vh; display:flex; align-items:center; justify-content:center; background:#f3f4f6; padding:32px 16px;">
+        <div style="width:100%; max-width:420px; background:white; border-radius:16px;
+                    box-shadow:0 10px 25px rgba(0,0,0,0.08); padding:28px 24px;">
+            <div style="text-align:center; margin-bottom:20px;">
+                <h1 style="font-size:22px; font-weight:700; margin-bottom:4px; color:#6b2b12;">
+                    Daftar Akun
+                </h1>
+                <p style="font-size:13px; color:#6b7280;">
+                    Buat akun untuk memudahkan pemesanan roti dan kue.
+                </p>
+            </div>
+
+            <form method="POST" action="{{ route('register') }}" style="display:flex; flex-direction:column; gap:12px;">
+                @csrf
+
+                <div>
+                    <label for="name" style="display:block; font-size:13px; font-weight:600; margin-bottom:4px;">Nama</label>
+                    <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus
+                           style="width:100%; padding:9px 11px; border-radius:8px; border:1px solid #d1d5db; font-size:14px;">
+                    @error('name')
+                        <p style="color:#dc2626; font-size:12px; margin-top:4px;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="email" style="display:block; font-size:13px; font-weight:600; margin-bottom:4px;">Email</label>
+                    <input id="email" name="email" type="email" value="{{ old('email') }}" required
+                           style="width:100%; padding:9px 11px; border-radius:8px; border:1px solid #d1d5db; font-size:14px;">
+                    @error('email')
+                        <p style="color:#dc2626; font-size:12px; margin-top:4px;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="password" style="display:block; font-size:13px; font-weight:600; margin-bottom:4px;">Password</label>
+                    <input id="password" name="password" type="password" required
+                           style="width:100%; padding:9px 11px; border-radius:8px; border:1px solid #d1d5db; font-size:14px;">
+                    @error('password')
+                        <p style="color:#dc2626; font-size:12px; margin-top:4px;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="password_confirmation" style="display:block; font-size:13px; font-weight:600; margin-bottom:4px;">
+                        Konfirmasi Password
+                    </label>
+                    <input id="password_confirmation" name="password_confirmation" type="password" required
+                           style="width:100%; padding:9px 11px; border-radius:8px; border:1px solid #d1d5db; font-size:14px;">
+                </div>
+
+                <button type="submit"
+                        style="margin-top:8px; padding:10px 14px; border-radius:999px; border:none;
+                               background:#f97316; color:white; font-size:14px; font-weight:600; cursor:pointer; width:100%;">
+                    Daftar
+                </button>
+
+                <div style="text-align:center; margin-top:10px; font-size:13px; color:#6b7280;">
+                    Sudah punya akun?
+                    <a href="{{ route('login') }}" style="color:#f97316; font-weight:600; text-decoration:none;">
+                        Login
+                    </a>
+                </div>
+            </form>
         </div>
-
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </section>
+@endsection

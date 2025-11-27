@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('breadcrumb')
-    <a href="{{ route('dashboard') }}">Dashboard</a> / <a href="{{ route('categories.index') }}">Kategori</a> / Tambah Baru
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a> / <a href="{{ route('admin.categories.index') }}">Kategori</a> / Tambah Baru
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">Tambah Kategori Baru</div>
 
-    <form method="POST" action="{{ route('categories.store') }}" style="padding: 20px;">
+    <form method="POST" action="{{ route('admin.categories.store') }}" style="padding: 20px;">
         @csrf
 
         <div class="form-group">
@@ -24,7 +24,7 @@
 
         <div style="display: flex; gap: 10px;">
             <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="{{ route('categories.index') }}" class="btn btn-secondary">Batal</a>
+            <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Batal</a>
         </div>
     </form>
 </div>

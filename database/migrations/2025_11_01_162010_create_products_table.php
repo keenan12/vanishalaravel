@@ -15,6 +15,9 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->integer('stock');
             $table->string('sku')->unique();
+            $table->foreignId('category_id') 
+                  ->constrained()
+                  ->onDelete('cascade');
             $table->string('image')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();

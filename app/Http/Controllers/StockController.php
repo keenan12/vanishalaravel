@@ -45,6 +45,6 @@ class StockController extends Controller
         // Catat history
         StockHistory::create($request->all());
 
-        return redirect()->route('stocks.index')->with('success', 'Stock berhasil dicatat');
+        return redirect()->route('admin.stocks.index')->with('success', 'Stock berhasil dicatat');
     }
 }

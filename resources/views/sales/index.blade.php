@@ -7,7 +7,7 @@
         <!-- HEADER -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 15px;">
             <h2 style="margin: 0; color: #333;">📊 Data Penjualan</h2>
-            <a href="{{ route('sales.create') }}" style="background: #667eea; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-weight: bold;">+ Tambah Penjualan</a>
+            <a href="{{ route('admin.sales.create') }}" style="background: #667eea; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-weight: bold;">+ Tambah Penjualan</a>
         </div>
 
         <!-- MESSAGE -->
@@ -52,8 +52,8 @@
                                 </td>
                                 <td style="padding: 12px; text-align: center; font-size: 12px;">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                                 <td style="padding: 12px; text-align: center;">
-                                    <a href="{{ route('sales.edit', $sale->id) }}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; margin-right: 5px; display: inline-block;">Edit</a>
-                                    <form action="{{ route('sales.destroy', $sale->id) }}" method="POST" style="display: inline;">
+                                    <a href="{{ route('admin.sales.edit', $sale->id) }}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; margin-right: 5px; display: inline-block;">Edit</a>
+                                    <form action="{{ route('admin.sales.destroy', $sale->id) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" style="background: #e74c3c; color: white; padding: 6px 12px; border-radius: 4px; border: none; font-size: 12px; cursor: pointer;" onclick="return confirm('Yakin hapus data ini?')">Hapus</button>
@@ -67,7 +67,7 @@
         @else
             <div style="text-align: center; padding: 40px; color: #999;">
                 <p style="font-size: 16px;">📭 Belum ada data penjualan</p>
-                <a href="{{ route('sales.create') }}" style="color: #667eea; text-decoration: none;">Tambah penjualan pertama →</a>
+                <a href="{{ route('admin.sales.create') }}" style="color: #667eea; text-decoration: none;">Tambah penjualan pertama →</a>
             </div>
         @endif
 

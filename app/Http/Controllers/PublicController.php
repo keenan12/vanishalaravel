@@ -2,50 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail; // Pastikan Anda mengaktifkan ini jika ingin kirim email sungguhan
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage; // <--- Diimpor jika Anda perlu mengakses Storage
 
 class PublicController extends Controller
 {
-    // --- Halaman View ---
+    /**
+     * Tampilkan Halaman Utama (Homepage)
+     * Menggunakan limit 6 produk terbaru (sesuai kode asli Anda).
+     */
     public function index()
     {
-        return view('public.index'); 
+        // Mengambil hanya 6 produk aktif terbaru untuk ditampilkan di homepage
+        $products = Product::with('category')
+                            ->where('status', 'active')
+                            ->orderBy('created_at', 'desc')
+                            ->limit(6) // <-- Batasan 6 produk hanya di homepage
+                            ->get();
+
+        // Asumsi view untuk homepage adalah public.index
+        return view('public.index', compact('products')); 
     }
 
+    /**
+     * Tampilkan Halaman Tentang Kami.
+     */
     public function about()
     {
         return view('public.tentang');
     }
 
+    /**
+     * Tampilkan Halaman Kontak.
+     */
     public function contact()
     {
         return view('public.kontak'); 
     }
 
-    public function menu()
+    /**
+     * Tampilkan Halaman Menu Produk dengan Filter dan Pagination.
+     * Menggunakan paginate(12) agar semua produk muncul dalam beberapa halaman.
+     */
+    public function menu(Request $request)
     {
-        // Data Dummy (Seharusnya diambil dari database)
-        $products = [
-            ['name' => 'Butter Croissant', 'price' => 12000, 'rating' => '★★★★★', 'image' => 'images/croissant.jpg'],
-            ['name' => 'Chocolate Lava Cake', 'price' => 45000, 'rating' => '★★★★☆', 'image' => 'images/lavacake.jpg'],
-            ['name' => 'Artisan Sourdough Loaf', 'price' => 35000, 'rating' => '★★★★★', 'image' => 'images/sourdough.jpg'],
-            ['name' => 'Almond Danish', 'price' => 18000, 'rating' => '★★★★☆', 'image' => 'images/danish.jpg'], // Tambahkan gambar ini ke public/images/
-        ];
-        return view('public.produk', compact('products')); 
+        // 1. Ambil semua kategori untuk filter dropdown
+        $categories = Category::orderBy('name')->get(); 
+
+        // 2. Mulai query Produk
+        // Hanya ambil produk yang statusnya 'active'
+        $productsQuery = Product::where('status', 'active')
+                                 ->with('category')
+                                 ->orderBy('name');
+        
+        // 3. Logika Filtering berdasarkan Kategori
+        if ($request->filled('category_id')) {
+            $productsQuery->where('category_id', $request->input('category_id'));
+        }
+
+        // 4. Eksekusi query dengan Pagination
+        // Semua produk aktif akan tampil, dibagi per 12 item per halaman
+        $products = $productsQuery->paginate(12)->withQueryString(); 
+
+        // 5. Kirim data ke view public.produk
+        return view('public.produk', compact('products', 'categories'));
     }
 
-    // --- Fungsionalitas Kontak ---
+    /**
+     * Proses pengiriman form kontak.
+     */
     public function sendContact(Request $request)
     {
-        // 1. Validasi Input (Wajib untuk keamanan dan fungsionalitas)
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'message' => 'required|string|min:10',
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|max:255',
+            'message'   => 'required|string|min:10',
         ]);
+
+        // Opsional: Logika pengiriman email di sini
+        // Mail::to('admin@domain.com')->send(new ContactMail($request->all()));
         
-        // 3. Redirect dengan pesan sukses
-        return redirect()->route('contact')->with('success', 'Terima kasih! Pesan Anda telah kami terima dan akan segera kami balas.');
+        return redirect()->route('contact')
+            ->with('success', 'Terima kasih! Pesan Anda telah kami terima dan akan segera kami balas.');
     }
 }

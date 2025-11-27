@@ -736,7 +736,7 @@
 
                     <div class="action-row">
                         <button type="submit" class="btn-save-modern">💾 Simpan Perubahan</button>
-                        <a href="{{ route('dashboard') }}" class="btn-cancel-modern">❌ Batal</a>
+                        <a href="{{ route('admin.dashboard') }}" class="btn-cancel-modern">❌ Batal</a>
                     </div>
                 </div>
             </div>

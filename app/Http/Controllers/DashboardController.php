@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Sale;
+use App\Models\Sale; // Pastikan Model Sale diimpor
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $month = request('month', now()->month);
         $year = request('year', now()->year);
 
-        // Months list
+        // Months list (Digunakan di view filter)
         $months = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
             4 => 'April', 5 => 'Mei', 6 => 'Juni',
@@ -23,7 +23,7 @@ class DashboardController extends Controller
             10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
 
-        // Stats
+        // --- STATISTIK KARTU ---
         $totalProducts = Product::count();
         $totalCategories = Category::count();
         $totalStock = Product::sum('stock');
@@ -36,8 +36,9 @@ class DashboardController extends Controller
         $monthlySales = Sale::whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
             ->sum('total_price');
+        // -------------------------
 
-        // Daily sales
+        // Daily sales (Untuk Chart Garis)
         $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
         $dailySales = [];
         for ($i = 1; $i <= $daysInMonth; $i++) {
@@ -47,27 +48,19 @@ class DashboardController extends Controller
                 ->sum('total_price');
         }
 
-        // Top 5 products
-        $topProducts = Sale::selectRaw('product_id, SUM(quantity) as total')
+        // Top 5 products (Untuk Chart Bar)
+        $topSalesQuery = Sale::selectRaw('product_id, SUM(quantity) as total')
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
             ->groupBy('product_id')
             ->orderByDesc('total')
             ->limit(5)
-            ->pluck('total')
-            ->toArray();
-
-        $topProductNames = Sale::selectRaw('product_id, SUM(quantity) as total')
-            ->with('product')
-            ->whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)
-            ->groupBy('product_id')
-            ->orderByDesc('total')
-            ->limit(5)
-            ->get()
-            ->pluck('product.name')
-            ->toArray();
-
+            ->get();
+            
+        $topProducts = $topSalesQuery->pluck('total')->toArray();
+        $topProductNames = $topSalesQuery->pluck('product.name')->toArray(); // Asumsi relasi 'product' ada di model Sale
+        
+        // Kirim semua variabel yang dibutuhkan oleh dashboard.blade.php
         return view('dashboard', compact(
             'totalProducts',
             'totalCategories',

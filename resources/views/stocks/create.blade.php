@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('breadcrumb')
-    <a href="{{ route('dashboard') }}">Dashboard</a> / <a href="{{ route('stocks.index') }}">Stock</a> / Tambah
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a> / <a href="{{ route('admin.stocks.index') }}">Stock</a> / Tambah
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">Masuk/Keluar Stock</div>
 
-    <form method="POST" action="{{ route('stocks.store') }}" style="padding: 20px;">
+    <form method="POST" action="{{ route('admin.stocks.store') }}" style="padding: 20px;">
         @csrf
 
         <div class="form-group">
@@ -51,7 +51,7 @@
 
         <div style="display: flex; gap: 10px;">
             <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="{{ route('stocks.index') }}" class="btn btn-secondary">Batal</a>
+            <a href="{{ route('admin.stocks.index') }}" class="btn btn-secondary">Batal</a>
         </div>
     </form>
 </div>

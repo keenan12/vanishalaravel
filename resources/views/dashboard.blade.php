@@ -8,7 +8,7 @@
 
 <!-- FILTER BULAN & TAHUN -->
 <div class="card" style="margin-bottom: 25px;">
-    <form method="GET" action="{{ route('dashboard') }}" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+    <form method="GET" action="{{ route('admin.dashboard') }}" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
         
         <div style="flex: 1; min-width: 200px;">
             <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px;">📅 Pilih Bulan</label>
@@ -163,16 +163,16 @@
 
 <!-- QUICK LINKS -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 30px;">
-    <a href="{{ route('products.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none; color: #667eea; font-weight: 600; border: 2px solid #e0e0e0; transition: all 0.3s; cursor: pointer;">
-        📦 Kelola Produk
+    <a href="{{ route('admin.products.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none;">
+    📦 Kelola Produk
     </a>
-    <a href="{{ route('stocks.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none; color: #f5576c; font-weight: 600; border: 2px solid #e0e0e0; transition: all 0.3s; cursor: pointer;">
+    <a href="{{ route('admin.stocks.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none; color: #f5576c; font-weight: 600; border: 2px solid #e0e0e0; transition: all 0.3s; cursor: pointer;">
         📊 Kelola Stock
     </a>
-    <a href="{{ route('sales.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none; color: #4facfe; font-weight: 600; border: 2px solid #e0e0e0; transition: all 0.3s; cursor: pointer;">
+    <a href="{{ route('admin.sales.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none; color: #4facfe; font-weight: 600; border: 2px solid #e0e0e0; transition: all 0.3s; cursor: pointer;">
         💳 Catat Penjualan
     </a>
-    <a href="{{ route('reports.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none; color: #fa709a; font-weight: 600; border: 2px solid #e0e0e0; transition: all 0.3s; cursor: pointer;">
+    <a href="{{ route('admin.reports.index') }}" style="background: white; padding: 20px; border-radius: 8px; text-align: center; text-decoration: none; color: #fa709a; font-weight: 600; border: 2px solid #e0e0e0; transition: all 0.3s; cursor: pointer;">
         📋 Lihat Laporan
     </a>
 </div>

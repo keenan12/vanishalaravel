@@ -9,7 +9,7 @@
     <div class="card-header">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <span>Riwayat Stock</span>
-            <a href="{{ route('stocks.create') }}" class="btn btn-primary">+ Masuk/Keluar Stock</a>
+            <a href="{{ route('admin.stocks.create') }}" class="btn btn-primary">+ Masuk/Keluar Stock</a>
         </div>
     </div>
 

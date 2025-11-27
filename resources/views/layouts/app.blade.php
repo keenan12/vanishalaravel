@@ -403,6 +403,68 @@
             text-decoration: underline;
         }
 
+        /* ==================== ALERTS/FLASH MESSAGES (NEW) ==================== */
+        .alert-container {
+            position: fixed;
+            top: 80px; /* Jarak dari topbar */
+            right: 30px;
+            width: 100%;
+            max-width: 400px;
+            z-index: 1050;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 5px solid;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: fadeInOut 0.5s ease-in-out;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background-color: #ecfdf5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            background-color: #fef2f2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+        
+        .alert-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            font-size: 18px;
+            line-height: 1;
+            margin-left: 10px;
+            transition: opacity 0.2s;
+        }
+        
+        .alert-close:hover {
+            opacity: 0.8;
+        }
+        
+        @keyframes fadeInOut {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* ==================== BUTTONS ==================== */
         .btn {
             padding: 10px 18px;
@@ -733,6 +795,12 @@
                 max-width: 100%;
                 margin-top: 60px;
             }
+            
+            .alert-container {
+                top: 70px; /* Sesuaikan posisi alert di mobile */
+                right: 15px;
+                max-width: calc(100% - 30px);
+            }
 
             .breadcrumb {
                 font-size: 12px;
@@ -850,6 +918,10 @@
                 padding: 15px;
                 margin-top: 50px;
             }
+            
+            .alert-container {
+                top: 60px;
+            }
 
             .btn {
                 padding: 8px 12px;
@@ -908,7 +980,8 @@
         @media print {
             .sidebar,
             .topbar,
-            .menu-toggle {
+            .menu-toggle,
+            .alert-container { /* Sembunyikan alert saat print */
                 display: none;
             }
 
@@ -919,37 +992,34 @@
             .content {
                 max-width: 100%;
                 padding: 20px;
+                margin-top: 0;
             }
         }
     </style>
 </head>
 <body>
     <div class="container-fluid">
-        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <h2>Vanisha Bakery</h2>
             <ul>
-                <li><a href="{{ route('dashboard') }}" class="@if(Route::currentRouteName() == 'dashboard') active @endif">📊 Dashboard</a></li>
-                <li><a href="{{ route('products.index') }}" class="@if(str_contains(Route::currentRouteName(), 'products')) active @endif">📦 Produk</a></li>
-                <li><a href="{{ route('categories.index') }}" class="@if(str_contains(Route::currentRouteName(), 'categories')) active @endif">🏷️ Kategori</a></li>
-                <li><a href="{{ route('stocks.index') }}" class="@if(str_contains(Route::currentRouteName(), 'stocks')) active @endif">📈 Stock</a></li>
-                <li><a href="{{ route('sales.index') }}" class="@if(str_contains(Route::currentRouteName(), 'sales')) active @endif">💳 Penjualan</a></li>
-                <li><a href="{{ route('reports.index') }}" class="@if(str_contains(Route::currentRouteName(), 'reports')) active @endif">📋 Laporan</a></li>
+                <li><a href="{{ route('admin.dashboard') }}" class="@if(Route::currentRouteName() == 'admin.dashboard') active @endif">📊 Dashboard</a></li>
+                <li><a href="{{ route('admin.products.index') }}" class="@if(str_contains(Route::currentRouteName(), 'products')) active @endif">📦 Produk</a></li>
+                <li><a href="{{ route('admin.categories.index') }}" class="@if(str_contains(Route::currentRouteName(), 'categories')) active @endif">🏷️ Kategori</a></li>
+                <li><a href="{{ route('admin.stocks.index') }}" class="@if(str_contains(Route::currentRouteName(), 'stocks')) active @endif">📈 Stock</a></li>
+                <li><a href="{{ route('admin.sales.index') }}" class="@if(str_contains(Route::currentRouteName(), 'sales')) active @endif">💳 Penjualan</a></li>
+                <li><a href="{{ route('admin.reports.index') }}" class="@if(str_contains(Route::currentRouteName(), 'reports')) active @endif">📋 Laporan</a></li>
             </ul>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <div class="main-content">
-            <!-- TOPBAR -->
             <div class="topbar">
                 <div class="topbar-left">@yield('breadcrumb')</div>
                 <button class="menu-toggle" id="menuToggle">☰</button>
                 <div class="topbar-right">
-                    <!-- PROFILE DROPDOWN -->
                     <div class="profile-dropdown">
                         <button class="profile-btn" id="profileBtn">
                             <div class="profile-avatar-wrapper">
-                                <img src="{{ Auth::user()->getAvatarUrl() }}" alt="{{ Auth::user()->name }}">
+                                <img src="{{ Auth::user()->getAvatarUrl() ?? 'path/to/default/avatar.png' }}" alt="{{ Auth::user()->name }}"> 
                                 <div class="profile-status"></div>
                             </div>
                             <div class="profile-info">
@@ -961,11 +1031,10 @@
                             </svg>
                         </button>
                         
-                        <!-- DROPDOWN MENU -->
                         <div class="dropdown-menu" id="dropdownMenu">
                             <div class="dropdown-header">
                                 <div class="dropdown-avatar">
-                                    <img src="{{ Auth::user()->getAvatarUrl() }}" alt="{{ Auth::user()->name }}">
+                                    <img src="{{ Auth::user()->getAvatarUrl() ?? 'path/to/default/avatar.png' }}" alt="{{ Auth::user()->name }}">
                                 </div>
                                 <div class="dropdown-user-info">
                                     <div class="dropdown-name">{{ Auth::user()->name }}</div>
@@ -973,7 +1042,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Menu Items -->
                             <div class="dropdown-body">
                                 <a href="{{ route('profile.edit') }}" class="dropdown-item">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -992,7 +1060,6 @@
                                 </a>
                             </div>
                             
-                            <!-- Logout -->
                             <div class="dropdown-footer">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -1010,21 +1077,58 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="alert-container" id="alertContainer">
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        <span>{{ session('success') }}</span>
+                        <button class="alert-close" onclick="this.closest('.alert').style.display='none'">
+                            &times;
+                        </button>
+                    </div>
+                @endif
 
-            <!-- CONTENT - TANPA ALERT DISPLAY -->
+                @if (session('error'))
+                    <div class="alert alert-error">
+                        <span>{{ session('error') }}</span>
+                        <button class="alert-close" onclick="this.closest('.alert').style.display='none'">
+                            &times;
+                        </button>
+                    </div>
+                @endif
+                
+                @if (session('warning'))
+                    <div class="alert alert-warning">
+                        <span>{{ session('warning') }}</span>
+                        <button class="alert-close" onclick="this.closest('.alert').style.display='none'">
+                            &times;
+                        </button>
+                    </div>
+                @endif
+                
+                @if ($errors->any())
+                    <div class="alert alert-error">
+                        <span>⚠️ **Terjadi Kesalahan!** Mohon periksa kembali input Anda.</span>
+                        <button class="alert-close" onclick="this.closest('.alert').style.display='none'">
+                            &times;
+                        </button>
+                    </div>
+                @endif
+            </div>
+
             <div class="content">
                 @yield('content')
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menuToggle');
             const sidebar = document.getElementById('sidebar');
             const profileBtn = document.getElementById('profileBtn');
             const dropdownMenu = document.getElementById('dropdownMenu');
+            const alertContainer = document.getElementById('alertContainer'); // NEW
 
             // Toggle sidebar
             if (menuToggle) {
@@ -1038,7 +1142,8 @@
             if (profileBtn && dropdownMenu) {
                 profileBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+                    // Menggunakan toggle class lebih baik daripada display style
+                    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
                 });
 
                 document.addEventListener('click', function(e) {
@@ -1073,6 +1178,18 @@
                     }
                 }
             });
+
+            if (alertContainer) {
+                const alerts = alertContainer.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    setTimeout(() => {
+                        alert.style.opacity = '0';
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 500);
+                    }, 5000); 
+                });
+            }
         });
     </script>
 </body>

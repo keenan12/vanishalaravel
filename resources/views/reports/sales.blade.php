@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('breadcrumb')
-    <a href="{{ route('dashboard') }}">Dashboard</a> / <a href="{{ route('reports.index') }}">Laporan</a> / Penjualan
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a> / <a href="{{ route('admin.reports.index') }}">Laporan</a> / Penjualan
 @endsection
 
 @section('content')
@@ -10,7 +10,7 @@
 
     <!-- FILTER BULAN -->
     <div style="padding: 15px; background-color: #f9f9f9; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
-        <form method="GET" action="{{ route('reports.sales') }}" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+        <form method="GET" action="{{ route('admin.reports.sales') }}" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
             <div>
                 <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Bulan</label>
                 <select name="month" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
@@ -33,11 +33,11 @@
 
     <!-- EXPORT BUTTONS -->
     <div style="padding: 15px; background-color: #f0f8ff; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="{{ route('reports.exportSalesExcel', ['month' => $month, 'year' => $year]) }}" 
+        <a href="{{ route('admin.reports.exportSalesExcel', ['month' => $month, 'year' => $year]) }}" 
            class="btn btn-primary" style="padding: 10px 20px; font-size: 13px;">
            📊 Download Excel
         </a>
-        <a href="{{ route('reports.exportSalesPDF', ['month' => $month, 'year' => $year]) }}" 
+        <a href="{{ route('admin.reports.exportSalesPDF', ['month' => $month, 'year' => $year]) }}" 
            class="btn btn-danger" style="padding: 10px 20px; font-size: 13px;">
            📄 Download PDF
         </a>

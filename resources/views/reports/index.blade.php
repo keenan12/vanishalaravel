@@ -400,7 +400,7 @@
     <div class="filter-section">
         <div class="filter-title">🔍 Filter Laporan Penjualan</div>
         
-        <form method="GET" action="{{ route('reports.index') }}" class="filter-form">
+        <form method="GET" action="{{ route('admin.reports.index') }}" class="filter-form">
             <div class="filter-grid">
                 <div class="filter-group">
                     <label for="month">Bulan</label>
@@ -431,7 +431,7 @@
                 <button type="submit" class="btn-filter btn-filter-search">
                     🔎 Cari Laporan
                 </button>
-                <a href="{{ route('reports.index') }}" class="btn-filter btn-filter-reset">
+                <a href="{{ route('admin.reports.index') }}" class="btn-filter btn-filter-reset">
                     ↻ Reset Filter
                 </a>
             </div>
@@ -508,11 +508,11 @@
 
             <!-- ACTION BUTTONS -->
             <div class="action-buttons">
-                <a href="{{ route('reports.export.sales.pdf', ['month' => $month, 'year' => $year]) }}" 
+                <a href="{{ route('admin.reports.export.sales.pdf', ['month' => $month, 'year' => $year]) }}" 
                    class="btn-action btn-print" target="_blank">
                     🖨️ Export PDF
                 </a>
-                <a href="{{ route('reports.export.sales.excel', ['month' => $month, 'year' => $year]) }}" 
+                <a href="{{ route('admin.reports.export.sales.excel', ['month' => $month, 'year' => $year]) }}" 
                    class="btn-action btn-export">
                     📥 Export Excel
                 </a>

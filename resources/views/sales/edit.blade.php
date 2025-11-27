@@ -6,7 +6,7 @@
         
         <h2 style="color: #333; margin-top: 0;">✏️ Edit Penjualan</h2>
 
-        <form action="{{ route('sales.update', $sale->id) }}" method="POST">
+        <form action="{{ route('admin.sales.update', $sale->id) }}" method="POST">
             @csrf
             @method('PATCH')
 
@@ -52,7 +52,7 @@
 
             <div style="display: flex; gap: 10px;">
                 <button type="submit" style="background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1;">💾 Update</button>
-                <a href="{{ route('sales.index') }}" style="background: #95a5a6; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; text-align: center; font-weight: bold; flex: 1;">Batal</a>
+                <a href="{{ route('admin.sales.index') }}" style="background: #95a5a6; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; text-align: center; font-weight: bold; flex: 1;">Batal</a>
             </div>
         </form>
     </div>

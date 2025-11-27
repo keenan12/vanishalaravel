@@ -22,7 +22,7 @@ class AdminMiddleware
 
         // Cek apakah user adalah admin
         if (auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized - Hanya admin yang dapat mengakses halaman ini');
+            return redirect()->route('dashboard')->with('warning', 'Anda tidak memiliki izin akses Admin.');
         }
 
         return $next($request);
