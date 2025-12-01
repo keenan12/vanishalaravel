@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('breadcrumb')
-    Dashboard / <a href="{{ route('users.index') }}">User Management</a> / Tambah User
+    Dashboard / <a href="{{ route('admin.users.index') }}">User Management</a> / Tambah User
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">➕ Tambah User Baru</div>
 
-    <form action="{{ route('users.store') }}" method="POST" style="padding: 20px;">
+    <form action="{{ route('admin.users.store') }}" method="POST" style="padding: 20px;">
         @csrf
 
         <div class="form-group">
@@ -24,13 +24,8 @@
         </div>
 
         <!-- ⭐ TAMBAHKAN FIELD ROLE -->
-        <div class="form-group">
-            <label>Role</label>
-            <select name="role" required>
-                <option value="">-- Pilih Role --</option>
-                <option value="customer" {{ old('role') == 'customer' ? 'selected' : '' }}>Customer (Pelanggan)</option>
-                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-            </select>
+        <div class="form-group" style="display: none;">
+            <input type="hidden" name="role" value="admin">
             @error('role') <small style="color: red;">{{ $message }}</small> @enderror
         </div>
 
@@ -47,7 +42,7 @@
 
         <div style="display: flex; gap: 10px;">
             <button type="submit" class="btn btn-primary">💾 Simpan</button>
-            <a href="{{ route('users.index') }}" class="btn btn-secondary">Batal</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Batal</a>
         </div>
     </form>
 </div>

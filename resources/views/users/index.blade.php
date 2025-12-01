@@ -7,8 +7,8 @@
 @section('content')
 <div class="card">
     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-        <span>👥 Manajemen User</span>
-        <a href="{{ route('users.create') }}" class="btn btn-primary">+ Tambah User</a>
+        <span>👥 Manajemen Admin</span>
+        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">+ Tambah Admin</a>
     </div>
 
     @if(session('success'))
@@ -42,8 +42,8 @@
                     </td>
                     <td>{{ $user->created_at->format('d/m/Y') }}</td>
                     <td>
-                        <a href="{{ route('users.edit', $user) }}" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">Edit</a>
-                        <form action="{{ route('users.destroy', $user) }}" method="POST" style="display: inline;">
+                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">Edit</a>
+                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" style="display: inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="return confirm('Yakin?')">Hapus</button>
@@ -52,7 +52,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="text-align: center;">Belum ada user</td> <!-- ⭐ UPDATE COLSPAN -->
+                    <td colspan="6" style="text-align: center;">Belum ada admin</td> <!-- ⭐ UPDATE COLSPAN -->
                 </tr>
             @endforelse
         </tbody>

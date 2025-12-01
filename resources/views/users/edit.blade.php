@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('breadcrumb')
-    Dashboard / <a href="{{ route('users.index') }}">User Management</a> / Edit User
+    Dashboard / <a href="{{ route('admin.users.index') }}">User Management</a> / Edit User
 @endsection
 
 @section('content')
 <div class="card">
     <div class="card-header">✏️ Edit User</div>
 
-    <form action="{{ route('users.update', $user) }}" method="POST" style="padding: 20px;">
+    <form action="{{ route('admin.users.update', $user) }}" method="POST" style="padding: 20px;">
         @csrf
         @method('PATCH')
 
@@ -26,11 +26,9 @@
 
         <!-- ⭐ TAMBAHKAN FIELD ROLE -->
         <div class="form-group">
-            <label>Role</label>
-            <select name="role" required>
-                <option value="customer" {{ $user->role == 'customer' ? 'selected' : '' }}>Customer (Pelanggan)</option>
-                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-            </select>
+            <label>Role</label>            
+            <input type="text" value="Admin" disabled>
+            <input type="hidden" name="role" value="admin">
             @error('role') <small style="color: red;">{{ $message }}</small> @enderror
         </div>
 
@@ -47,7 +45,7 @@
 
         <div style="display: flex; gap: 10px;">
             <button type="submit" class="btn btn-primary">💾 Update</button>
-            <a href="{{ route('users.index') }}" class="btn btn-secondary">Batal</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Batal</a>
         </div>
     </form>
 </div>

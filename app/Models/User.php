@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -16,6 +17,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'role',
+        'google_id',
         'theme',
     ];
 
@@ -28,7 +30,6 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
         ];
     }
 
@@ -37,7 +38,8 @@ class User extends Authenticatable
         if ($this->avatar) {
             return asset('storage/' . $this->avatar);
         }
-        // Fallback ke UI Avatars dengan ukuran 240px (bukan 40px)
+
+        // Fallback ke UI Avatars dengan ukuran 240px
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=667eea&color=fff&size=240';
     }
 

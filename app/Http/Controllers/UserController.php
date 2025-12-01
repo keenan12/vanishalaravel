@@ -9,7 +9,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::paginate(10);
+        $users = User::where('role', 'admin')->paginate(10);
         return view('users.index', compact('users'));
     }
 
@@ -34,7 +34,7 @@ class UserController extends Controller
             'role' => $validated['role'], // ⭐ TAMBAHKAN INI
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil dibuat');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil dibuat');
     }
 
     public function edit(User $user)
@@ -58,12 +58,12 @@ class UserController extends Controller
             'role' => $validated['role'], // ⭐ TAMBAHKAN INI
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil diupdate');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil diupdate');
     }
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User berhasil dihapus');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus');
     }
 }

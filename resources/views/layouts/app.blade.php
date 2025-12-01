@@ -1009,6 +1009,10 @@
                 <li><a href="{{ route('admin.sales.index') }}" class="@if(str_contains(Route::currentRouteName(), 'sales')) active @endif">💳 Penjualan</a></li>
                 <li><a href="{{ route('admin.reports.index') }}" class="@if(str_contains(Route::currentRouteName(), 'reports')) active @endif">📋 Laporan</a></li>
             </ul>
+            {{-- ⭐ TAMBAHKAN BAGIAN INI --}}
+            @if(Auth::user()->isAdmin())
+                <a href="{{ route('admin.users.index') }}" class="@if(str_contains(Route::currentRouteName(), 'users')) active @endif">👥 Kelola Admin</a>
+            @endif
         </aside>
 
         <div class="main-content">

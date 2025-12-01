@@ -16,9 +16,9 @@
             FRESH BREAD &amp; CAKES EVERYDAY
         </p>
 
-        {{-- Teks utama dengan animasi typing --}}
+        {{-- Teks utama dengan animasi fade rotator --}}
         <h1 style="font-size:30px; line-height:1.3; font-weight:800; margin:0 0 10px;">
-            <span id="hero-typing-text"></span>
+            <span id="hero-typing-text" style="transition: opacity 0.5s ease;"></span>
         </h1>
 
         {{-- subtitle tetap --}}
@@ -46,21 +46,18 @@
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px;">
             <div style="background:white; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.08);
                          padding:24px; text-align:center;">
-                {{-- Placeholder Icon --}}
                 <img src="{{ asset('img/bread_icon.png') }}" onerror="this.onerror=null; this.src='https://placehold.co/64x64/E7B547/ffffff?text=🍞'" style="height:64px; width:64px; object-fit:contain; margin-bottom:10px;">
                 <h3 style="font-size:18px; font-weight:600; margin-bottom:4px;">Bahan Segar</h3>
                 <p style="font-size:14px; color:#4b5563;">Dipanggang setiap hari dengan bahan lokal pilihan.</p>
             </div>
             <div style="background:white; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.08);
                          padding:24px; text-align:center;">
-                {{-- Placeholder Icon --}}
                 <img src="{{ asset('img/love_icon.png') }}" onerror="this.onerror=null; this.src='https://placehold.co/64x64/DC2626/ffffff?text=❤️'" style="height:64px; width:64px; object-fit:contain; margin-bottom:10px;">
                 <h3 style="font-size:18px; font-weight:600; margin-bottom:4px;">Dibuat Dengan Cinta</h3>
                 <p style="font-size:14px; color:#4b5563;">Resep keluarga yang kami jaga dari generasi ke generasi.</p>
             </div>
             <div style="background:white; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.08);
                          padding:24px; text-align:center;">
-                {{-- Placeholder Icon --}}
                 <img src="{{ asset('img/delivery_icon.png') }}" onerror="this.onerror=null; this.src='https://placehold.co/64x64/1D4ED8/ffffff?text=🛵'" style="height:64px; width:64px; object-fit:contain; margin-bottom:10px;">
                 <h3 style="font-size:18px; font-weight:600; margin-bottom:4px;">Pengiriman Cepat</h3>
                 <p style="font-size:14px; color:#4b5563;">Roti sampai ke rumah Anda dalam kondisi terbaik.</p>
@@ -102,25 +99,24 @@
             Menu Produk
         </h2>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px;">
+        {{-- TAMBAHKAN x-data DI SINI --}}
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px;" x-data>
             @forelse($products as $p)
                 <div style="background:white; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.08);
                              display:flex; flex-direction:column; overflow:hidden; transition:transform 0.2s;"
                              onmouseover="this.style.transform='translateY(-5px)'"
                              onmouseout="this.style.transform='translateY(0)'">
                     
-                    {{-- GAMBAR PRODUK (Menggunakan $p->image yang diasumsikan berisi path publik) --}}
+                    {{-- GAMBAR PRODUK --}}
                     @if($p->image)
                         <img src="{{ asset($p->image) }}"
                              alt="{{ $p->name }}"
                              style="width:100%; height:150px; object-fit:cover;">
                     @else
-                        {{-- Placeholder jika gambar tidak ada --}}
                         <div style="width:100%; height:150px; background-color:#f0f0f0; display:flex; align-items:center; justify-content:center; color:#999; font-size:14px; text-align:center; padding:10px;">
                             No Image
                         </div>
                     @endif
-                    {{-- END GAMBAR --}}
                     
                     <div style="padding:16px; display:flex; flex-direction:column; flex:1;">
                         <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">
@@ -129,13 +125,19 @@
                         <p style="font-size:16px; font-weight:800; color:#b91c1c; margin-bottom:12px;">
                             {{ formatRupiahHome($p->price) }}
                         </p>
+                        
+                        {{-- TOMBOL BELI DENGAN ALPINE.JS --}}
                         <button
+                            @click="$store.cart.addItem({
+                                id: {{ $p->id }},
+                                name: '{{ addslashes($p->name) }}',
+                                price: {{ $p->price }}
+                            })"
                             style="margin-top:auto; padding:8px 12px; border-radius:999px; border:none;
                                     background:#f97316; color:white; font-size:14px; font-weight:600;
                                     cursor:pointer; transition:background 0.3s;"
                             onmouseover="this.style.backgroundColor='#ea580c'" 
-                            onmouseout="this.style.backgroundColor='#f97316'"
-                            @click="$store.cart.addToCart('{{ addslashes($p->name) }}', {{ $p->price }})">
+                            onmouseout="this.style.backgroundColor='#f97316'">
                             <i class="fas fa-cart-plus" style="margin-right:4px;"></i> Beli
                         </button>
                     </div>
@@ -145,7 +147,6 @@
                     Belum ada produk yang tersedia.
                 </p>
             @endforelse
-
         </div>
     </div>
 </section>
@@ -206,27 +207,30 @@
     </div>
 </section>
 
+{{-- SCRIPT HERO TEXT ROTATOR - RAPI TANPA TYPEWRITER --}}
 <script>
-    // Script untuk efek mengetik (Typing Animation) pada Hero Section
-    document.addEventListener('DOMContentLoaded', function() {
-        const textElement = document.getElementById('hero-typing-text');
-        if (!textElement) return;
+document.addEventListener('DOMContentLoaded', function() {
+    const textElement = document.getElementById('hero-typing-text');
+    if (!textElement) return;
 
-        const textToType = "Rasakan kelezatan roti dan kue buatan kami.";
-        textElement.textContent = "";
-        let i = 0;
+    const texts = [
+        'Rasakan kelezatan roti dan kue buatan kami.',
+        'Dipanggang segar setiap pagi untuk Anda.',
+        'Nikmati cita rasa tradisional yang autentik.'
+    ];
+    
+    let index = 0;
+    textElement.textContent = texts[index];
 
-        function typeWriter() {
-            if (i < textToType.length) {
-                textElement.textContent += textToType.charAt(i);
-                i++;
-                setTimeout(typeWriter, 50); // Kecepatan mengetik: 50ms
-            }
-        }
-
-        typeWriter();
-    });
+    setInterval(function() {
+        textElement.style.opacity = '0';
+        setTimeout(function() {
+            index = (index + 1) % texts.length;
+            textElement.textContent = texts[index];
+            textElement.style.opacity = '1';
+        }, 400);
+    }, 4000);
+});
 </script>
-
 
 @endsection

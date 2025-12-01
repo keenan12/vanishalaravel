@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\Product;
+use App\Exports\SalesReportExport; // ⭐ 1. Import kelas baru
+use Maatwebsite\Excel\Facades\Excel; // ⭐ 2. Import Fassade Excel
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -61,62 +63,14 @@ class ReportController extends Controller
         $month = max(1, min(12, $month));
         $year = max(2020, min(2099, $year));
 
-        $sales = Sale::with('product')->where('status', 'completed')
-            ->whereMonth('created_at', $month)->whereYear('created_at', $year)
-            ->orderBy('created_at', 'asc')->get();
+        // Nama file .xlsx
+        $filename = 'Laporan_Penjualan_' . $this->months[$month] . '_' . $year . '.xlsx';
 
-        $filename = 'Laporan_Penjualan_' . $this->months[$month] . '_' . $year . '.csv';
-
-        return response()->streamDownload(function() use ($sales, $month, $year) {
-            $output = fopen('php://output', 'w');
-            
-            // BOM UTF-8 untuk Excel Indonesia
-            fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
-
-            // ========== TITLE ==========
-            fputcsv($output, ['VANISHA BAKERY']);
-            fputcsv($output, ['Laporan Penjualan Bulanan']);
-            fputcsv($output, ['Periode ' . $this->months[$month] . ' ' . $year]);
-            fputcsv($output, []);  // Blank row
-
-            // ========== HEADER TABLE ==========
-            fputcsv($output, [
-                'No',
-                'Produk',
-                'Pembeli',
-                'Qty (pcs)',
-                'Harga Satuan (Rp)',
-                'Total Harga (Rp)',
-                'Tanggal'
-            ]);
-
-            // ========== DATA ROWS ==========
-            $no = 1;
-            foreach ($sales as $sale) {
-                fputcsv($output, [
-                    $no++,
-                    $sale->product->name ?? '-',
-                    $sale->buyer_name ?? '-',
-                    (int)$sale->quantity,
-                    (int)$sale->price,
-                    (int)$sale->total_price,
-                    $sale->created_at->format('d/m/Y H:i')
-                ]);
-            }
-
-            // ========== BLANK ROW ==========
-            fputcsv($output, []);
-
-            // ========== SUMMARY SECTION ==========
-            fputcsv($output, ['Total Kuantitas Terjual', '', '', '', '', (int)$sales->sum('quantity'), 'pcs']);
-            fputcsv($output, ['Jumlah Transaksi', '', '', '', '', $sales->count(), 'x']);
-            fputcsv($output, ['TOTAL PENDAPATAN', '', '', '', '', (int)$sales->sum('total_price'), 'Rp']);
-
-            fclose($output);
-        }, $filename, [
-            'Content-Type' => 'text/csv; charset=utf-8-sig',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ]);
+        // ⭐ 3. Gunakan Laravel Excel untuk men-download
+        return Excel::download(
+            new SalesReportExport($month, $year, $this->months[$month]), 
+            $filename
+        );
     }
 
     public function exportSalesPDF(Request $request)
