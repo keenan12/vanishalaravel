@@ -75,16 +75,22 @@ class PublicController extends Controller
      */
     public function sendContact(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|max:255',
             'message'   => 'required|string|min:10',
         ]);
 
-        // Opsional: Logika pengiriman email di sini
-        // Mail::to('admin@domain.com')->send(new ContactMail($request->all()));
-        
-        return redirect()->route('contact')
-            ->with('success', 'Terima kasih! Pesan Anda telah kami terima dan akan segera kami balas.');
+        try {
+            // Send email to admin
+            $adminEmail = env('ADMIN_EMAIL', 'admin@vanishabakery.com');
+            Mail::to($adminEmail)->send(new \App\Mail\ContactFormMail($validated));
+            
+            return redirect()->route('contact')
+                ->with('success', 'Terima kasih! Pesan Anda telah kami terima dan akan segera kami balas.');
+        } catch (\Exception $e) {
+            return redirect()->route('contact')
+                ->with('error', 'Maaf, terjadi kesalahan. Silakan coba lagi nanti.');
+        }
     }
 }

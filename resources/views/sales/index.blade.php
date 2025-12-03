@@ -36,9 +36,9 @@
                     <tbody>
                         @foreach($sales as $sale)
                             <tr style="border-bottom: 1px solid #dee2e6; hover-color: #f5f5f5;">
-                                <td style="padding: 12px;">{{ $loop->iteration }}</td>
+                                <td style="padding: 12px;">{{ $sales->firstItem() + $loop->index }}</td>
                                 <td style="padding: 12px;">{{ $sale->product->name ?? '-' }}</td>
-                                <td style="padding: 12px;">{{ $sale->customer_name ?? 'Umum' }}</td>
+                                <td style="padding: 12px;">{{ $sale->buyer_name ?? $sale->customer_name ?? 'Umum' }}</td>
                                 <td style="padding: 12px; text-align: center;">{{ $sale->quantity }}</td>
                                 <td style="padding: 12px; text-align: right; font-weight: bold;">Rp {{ number_format($sale->total_price, 0, ',', '.') }}</td>
                                 <td style="padding: 12px; text-align: center;">
@@ -63,6 +63,11 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <!-- PAGINATION -->
+            <div style="margin-top: 20px;">
+                {{ $sales->links('vendor.pagination.custom') }}
             </div>
         @else
             <div style="text-align: center; padding: 40px; color: #999;">

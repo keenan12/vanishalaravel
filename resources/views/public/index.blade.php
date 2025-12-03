@@ -17,8 +17,9 @@
         </p>
 
         {{-- Teks utama dengan animasi fade rotator --}}
-        <h1 style="font-size:30px; line-height:1.3; font-weight:800; margin:0 0 10px;">
-            <span id="hero-typing-text" style="transition: opacity 0.5s ease;"></span>
+        {{-- Teks utama dengan animasi --}}
+        <h1 style="font-size:30px; line-height:1.3; font-weight:800; margin:0 0 10px; min-height: 40px;">
+            <span id="hero-typing-text">Nikmati cita rasa tradisional yang autentik.</span>
         </h1>
 
         {{-- subtitle tetap --}}
@@ -177,6 +178,19 @@
             <h3 style="font-size:18px; font-weight:600; margin-bottom:12px; color:#b91c1c;">
                 Kirim Pesan
             </h3>
+            
+            {{-- Success/Error Notification --}}
+            @if(session('success'))
+                <div style="background:#d4edda; color:#155724; padding:12px; border-radius:8px; margin-bottom:12px; border-left:4px solid #28a745;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div style="background:#f8d7da; color:#721c24; padding:12px; border-radius:8px; margin-bottom:12px; border-left:4px solid #dc3545;">
+                    {{ session('error') }}
+                </div>
+            @endif
+            
             <form action="{{ route('contact.send') }}" method="POST" style="display:flex; flex-direction:column; gap:10px;">
                 @csrf
                 <div>
@@ -207,29 +221,61 @@
     </div>
 </section>
 
-{{-- SCRIPT HERO TEXT ROTATOR - RAPI TANPA TYPEWRITER --}}
+{{-- SCRIPT HERO TEXT TYPEWRITER ANIMATION --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const textElement = document.getElementById('hero-typing-text');
     if (!textElement) return;
 
     const texts = [
+        'Nikmati cita rasa tradisional yang autentik.',
         'Rasakan kelezatan roti dan kue buatan kami.',
-        'Dipanggang segar setiap pagi untuk Anda.',
-        'Nikmati cita rasa tradisional yang autentik.'
+        'Dipanggang segar setiap pagi untuk Anda.'
     ];
     
-    let index = 0;
-    textElement.textContent = texts[index];
+    let textIndex = 0;
+    let charIndex = texts[0].length; // Start with full first sentence
+    let isDeleting = false;
+    let startDelay = true; // Flag to wait before first delete
+    
+    function type() {
+        const currentText = texts[textIndex];
+        let typeSpeed = 100; // Constant typing speed
 
-    setInterval(function() {
-        textElement.style.opacity = '0';
-        setTimeout(function() {
-            index = (index + 1) % texts.length;
-            textElement.textContent = texts[index];
-            textElement.style.opacity = '1';
-        }, 400);
-    }, 4000);
+        if (startDelay) {
+            // Initial delay after page load before deleting starts
+            startDelay = false;
+            setTimeout(type, 2000); // Wait 2 seconds before doing anything
+            return;
+        }
+
+        if (isDeleting) {
+            // Deleting
+            textElement.textContent = currentText.substring(0, charIndex - 1);
+            charIndex--;
+            typeSpeed = 50; // Constant delete speed
+        } else {
+            // Typing
+            textElement.textContent = currentText.substring(0, charIndex + 1);
+            charIndex++;
+            typeSpeed = 100; // Constant typing speed
+        }
+
+        if (!isDeleting && charIndex === currentText.length) {
+            // Finished typing, wait before deleting
+            isDeleting = true;
+            typeSpeed = 2000; 
+        } else if (isDeleting && charIndex === 0) {
+            // Finished deleting, move to next
+            isDeleting = false;
+            textIndex = (textIndex + 1) % texts.length;
+            typeSpeed = 500;
+        }
+
+        setTimeout(type, typeSpeed);
+    }
+
+    type();
 });
 </script>
 

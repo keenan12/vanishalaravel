@@ -4,42 +4,46 @@
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        @page { 
+            margin: 15mm 15mm 15mm 15mm;
+            size: A4 portrait;
+        }
         html, body { height: 100%; }
-        body { font-family: Arial, sans-serif; font-size: 11px; color: #333; }
+        body { font-family: Arial, sans-serif; font-size: 10px; color: #333; }
         
-        .page { width: 100%; page-break-after: always; padding: 15px 15px; }
+        .page { width: 100%; max-width: 100%; padding: 0; }
         
-        .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
-        .header h1 { font-size: 18px; margin: 0 0 3px 0; font-weight: bold; }
-        .header p { font-size: 11px; margin: 1px 0; }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px; }
+        .header h1 { font-size: 16px; margin: 0 0 2px 0; font-weight: bold; }
+        .header p { font-size: 10px; margin: 1px 0; }
         
-        .info-bar { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 10px; }
+        .info-bar { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 9px; }
         
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 9px; }
         thead { background: #000; color: white; }
-        th { padding: 6px; text-align: left; border: 1px solid #000; font-weight: bold; }
-        td { padding: 5px; border: 1px solid #999; }
+        th { padding: 5px 4px; text-align: left; border: 1px solid #000; font-weight: bold; font-size: 9px; }
+        td { padding: 4px; border: 1px solid #999; font-size: 9px; }
         tbody tr:nth-child(even) { background: #f9f9f9; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
         
-        .summary-box { margin: 15px 0; width: 100%; }
+        .summary-box { margin: 10px auto; width: 70%; max-width: 70%; }
         .summary-row { display: table; width: 100%; border: 1px solid #000; margin: 0; }
         .summary-row:not(:last-child) { border-bottom: none; }
-        .sum-label { display: table-cell; width: 65%; padding: 7px; border-right: 1px solid #000; font-weight: bold; vertical-align: middle; }
-        .sum-value { display: table-cell; width: 35%; padding: 7px 5px; text-align: right; font-weight: bold; vertical-align: middle; }
+        .sum-label { display: table-cell; width: 60%; padding: 6px 8px; border-right: 1px solid #000; font-weight: bold; vertical-align: middle; font-size: 9px; }
+        .sum-value { display: table-cell; width: 40%; padding: 6px 8px; text-align: right; font-weight: bold; vertical-align: middle; font-size: 9px; }
         .total-row { background: #d3d3d3; }
         
-        .signature-section { margin-top: 30px; width: 100%; }
-        .sig-container { display: table; width: 100%; }
-        .sig-left { display: table-cell; width: 50%; vertical-align: top; padding-right: 15px; text-align: center; }
-        .sig-right { display: table-cell; width: 50%; vertical-align: top; padding-left: 15px; text-align: center; }
+        .signature-section { margin-top: 20px; width: 100%; page-break-inside: avoid; }
+        .sig-container { display: flex; justify-content: space-between; width: 100%; }
+        .sig-box { width: 45%; text-align: center; }
         
-        .sig-name { font-weight: bold; margin-bottom: 35px; font-size: 10px; }
-        .sig-line { border-top: 1px solid #000; margin: 0; height: 25px; }
-        .sig-title { font-size: 9px; margin-top: 3px; }
+        .sig-label { font-weight: bold; margin-bottom: 3px; font-size: 9px; }
+        .sig-space { height: 40px; }
+        .sig-line { border-bottom: 1px solid #000; width: 80%; margin: 0 auto; }
+        .sig-name { font-size: 8px; margin-top: 3px; }
         
-        .footer { text-align: center; font-size: 8px; color: #666; margin-top: 15px; padding-top: 8px; border-top: 1px solid #999; }
+        .footer { text-align: center; font-size: 7px; color: #666; margin-top: 15px; padding-top: 6px; border-top: 1px solid #999; }
     </style>
 </head>
 <body>
@@ -76,10 +80,10 @@
                         <tr>
                             <td class="text-center">{{ $idx + 1 }}</td>
                             <td>{{ $sale->product->name ?? '-' }}</td>
-                            <td>{{ $sale->buyer_name ?? '-' }}</td>
+                            <td>{{ $sale->buyer_name ?? $sale->customer_name ?? 'Umum' }}</td>
                             <td class="text-center">{{ $sale->quantity }}</td>
-                            <td class="text-right">{{ number_format($sale->price, 0, ',', '.') }}</td>
-                            <td class="text-right">{{ number_format($sale->total_price, 0, ',', '.') }}</td>
+                            <td class="text-right">Rp {{ number_format($sale->product->price, 0, ',', '.') }}</td>
+                            <td class="text-right">Rp {{ number_format($sale->total_price, 0, ',', '.') }}</td>
                             <td class="text-center">{{ $sale->created_at->format('d/m/Y') }}</td>
                         </tr>
                     @endforeach
@@ -102,22 +106,24 @@
                 </div>
             </div>
 
-            <!-- SIGNATURE SECTION - BALANCED LEFT & RIGHT -->
+            <!-- SIGNATURE SECTION -->
             <div class="signature-section">
                 <div class="sig-container">
-                    <!-- LEFT SIDE -->
-                    <div class="sig-left">
-                        <div class="sig-name">Admin</div>
+                    <!-- LEFT SIDE - Admin -->
+                    <div class="sig-box">
+                        <div class="sig-label">Admin</div>
+                        <div class="sig-space"></div>
                         <div class="sig-line"></div>
-                        <div class="sig-title">(_________________)</div>
+                        <div class="sig-name">(_________________)</div>
                     </div>
                     
-                    <!-- RIGHT SIDE -->
-                    <div class="sig-right">
-                        <div class="sig-name">Jakarta, {{ now()->format('d/m/Y') }}</div>
-                        <p style="margin-bottom: 35px; font-size: 9px;">Mengetahui,</p>
+                    <!-- RIGHT SIDE - Mengetahui -->
+                    <div class="sig-box">
+                        <div class="sig-label">Jakarta, {{ now()->format('d/m/Y') }}</div>
+                        <div class="sig-label" style="font-weight: normal; margin-top: 3px;">Mengetahui,</div>
+                        <div class="sig-space"></div>
                         <div class="sig-line"></div>
-                        <div class="sig-title">(_________________)</div>
+                        <div class="sig-name">(_________________)</div>
                     </div>
                 </div>
             </div>
